@@ -1,0 +1,150 @@
+body {
+  background: #F4F4F9 linear-gradient(#EDF2F7);
+  font-family: 'Segoe UI', sans-serif;
+}
+
+/* Profile Image */
+.ImageBorder {
+  border: 2px solid black;
+  border-radius: 10px;
+  height: 100px;
+  width: 100px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;    
+}
+
+/* Prayer Card */
+.prayerCard {
+  border: 2px solid black;
+  border-radius: 16px;
+  background-color: white;
+  padding: 20px;
+  text-align: center;
+  width: 90%;
+  max-width: 300px;
+  margin: 0 auto;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.ImageText {
+  font-weight: bold;
+  font-size: 18px;
+  color: #333;
+  margin-bottom: 10px;
+}
+
+.MasjidImage {
+  width: 140px;
+  height: 140px;
+  object-fit: cover;
+  opacity: 0.6;
+  display: block;
+  margin: 0 auto 10px;
+}
+
+.RemainingTime {
+  font-size: 14px;
+  color: #555;
+  font-weight: bold;
+  text-align: center;
+}
+
+/* Prayer Time Boxes */
+.PrayerTime {
+  display: flex;
+  flex-direction: column;
+  margin-top: 30px;
+  padding: 0 20px;
+}
+
+.PrayerTime .prayerRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.prayerName {
+  font-weight: bold;
+  font-size: 16px;
+  color: #222;
+}
+
+.prayerTime {
+  font-weight: bold;
+  font-size: 15px;
+  color: #444;
+}
+
+
+
+/* Search Bar */
+.citySearchForm {
+  justify-content: center;
+  gap: 10px;
+}
+
+.cityInput {
+  flex: 1;
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+}
+
+.citySearchBtn {
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-weight: bold;
+  background-color: #222;
+  color: white;
+  border: none;
+  transition: background-color 0.2s ease;
+}
+
+.citySearchBtn:hover {
+  background-color: #000;
+  cursor: pointer;
+}
+
+/* Desktop layout */
+@media (min-width: 768px) {
+  .mainContentWrapper {
+    display: flex;
+    justify-content: flex-start;
+    align-items: flex-start;
+    padding: 40px 80px;
+    gap: 60px;
+  }
+
+  .prayerCardWrapper {
+    flex: 1;
+    display: flex;
+    justify-content: flex-start;
+  }
+
+  .PrayerTime {
+    flex: 1;
+    margin-top: 0;
+  }
+
+  .prayerCard {
+    margin: 0;
+    max-width: 360px;
+    padding: 30px;
+  }
+
+  .MasjidImage {
+    width: 160px;
+    height: 160px;
+  }
+
+  .ImageText {
+    font-size: 20px;
+  }
+
+  .RemainingTime {
+    font-size: 16px;
+  }
+}

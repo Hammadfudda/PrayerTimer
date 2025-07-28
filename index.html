@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Reminder App</title>
+   <link rel="icon" href="./Assests/islamic.png" type="image/x-icon" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="PrayerError"></div>
+  <div class="backgroundColor container-fluid">
+    
+    <!-- Navbar -->
+    <nav class="mt-5 navStart navbar navbar-expand-lg">
+      <div class="container-fluid">
+        <div class="d-flex align-items-center">
+          <div class="rounded-circle border border-black ImageBorder ms-2">
+            <img class="profileImage" src="https://img.freepik.com/premium-vector/person-icon_109161-4674.jpg" alt="image" style="width:100%; height:100%; object-fit:cover;">
+          </div>
+          <span class="userText ms-3 fw-bold text-bold">Hello User!</span>
+        </div>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent">
+          <span class="navbar-toggler-icon"></span>
+        </button>  
+      </div>
+    </nav>
+<div id="PrayerError"></div>
+    <!-- City Search Input -->
+    <div class="container mt-4 d-flex justify-content-center">
+      <div class="d-flex w-100 citySearchForm " style="max-width: 400px;">
+        <input
+          type="text"
+          class="form-control me-2 cityInput"
+          placeholder="City name"
+          id="cityInput"
+          required
+        />
+        <div id="loader"> 
+        <button onclick="SearchCityName()" class="btn btn-dark citySearchBtn" id="searchButton" >Search</button>
+      <span id="spinnerChecker" class="spinner-border" role="status"></span> 
+      </div>
+        
+        
+      
+      </div>
+    </div>
+
+    <!-- Main Content Wrapper -->
+    <div class="mainContentWrapper mt-4">
+      <div class="prayerCardWrapper">
+        <!-- Left: Main Prayer Card -->
+        <div class="prayerCard">
+          <div id="FrontTime">
+          <p class="ImageText">Zuhr - 1:15 PM</p>
+          </div>
+          <img src="./Assests/islamic.png" alt="Masjid" class="MasjidImage">
+          <div id="RemainingTime">
+          <p class="RemainingTime text-bold">Time Remaining: 1 hr 15 min</p>
+        </div>
+      </div>
+
+      <!-- Right: Prayer Time Boxes -->
+      <div   id="prayerTiming" class="PrayerTime">
+        <div class="border border-2 border-dark rounded p-2 mt-3 prayerRow">
+          <span class="prayerName  text-center"> Put a city name</span>
+  
+        </div>
+        <div class="border border-2 border-dark rounded p-2 mt-3 prayerRow">
+          <span class="prayerName">put a city name</span>
+          
+        </div>
+        <div class="border border-2 border-dark rounded p-2 mt-3 prayerRow">
+          <span class="prayerName">put a city name</span>
+          
+        </div>
+        <div class="border border-2 border-dark rounded p-2 mt-3 prayerRow">
+          <span class="prayerName">put a city name</span>
+          
+        </div>
+        <div class="border border-2 border-dark rounded p-2 mt-3 prayerRow">
+          <span class="prayerName">put a city name</span>
+          
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="reminder.js"></script>
+</body>
+</html>
