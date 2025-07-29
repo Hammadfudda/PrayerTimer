@@ -1,17 +1,15 @@
-
-  if ("serviceWorker" in navigator) {
-  window.addEventListener("load", function() {
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", function () {
     navigator.serviceWorker
       .register("/serviceWorker.js")
-      .then(res =>{
-
-
-         console.log("service worker registered")})
-      .catch(err => console.log("service worker not registered", err))
-  })
+      .then(res => {
+        console.log("service worker registered");
+      })
+      .catch(err => console.log("service worker not registered", err));
+  });
 }
 
-// Convert 24-hour to 12-hour format for display
+// Convert 24-hour to 12-hour format
 function convertTo12Hour(time24) {
   const [hourStr, minute] = time24.split(':');
   let hour = parseInt(hourStr, 10);
@@ -36,11 +34,13 @@ function getCityDate(timezone) {
   return new Date(cityString);
 }
 
-// Determine current and next prayer
+// --- Fixed getActivePrayer with fallback ---
 const getActivePrayer = (timings, cityNow) => {
   const prayers = ["Fajr", "Dhuhr", "Asr", "Maghrib", "Isha"];
+  const cleanTime = (time) => time.split(" ")[0];
+
   const toDate = (time) => {
-    const [h, m] = time.split(":").map(Number);
+    const [h, m] = cleanTime(time).split(":").map(Number);
     const d = new Date(cityNow);
     d.setHours(h, m, 0, 0);
     return d;
@@ -69,6 +69,7 @@ const getActivePrayer = (timings, cityNow) => {
       nextPrayerTime = timings[nextPrayerName];
       end = toDate(nextPrayerTime);
       if (nextIndex === 0) {
+        // Wrap to next day for Fajr
         end = new Date(end.getTime() + 24 * 60 * 60 * 1000);
       }
     }
@@ -84,10 +85,19 @@ const getActivePrayer = (timings, cityNow) => {
     }
   }
 
-  return { currentPrayer: null };
+  // --- Fallback after Isha until Fajr ---
+  const fajrTime = toDate(timings.Fajr);
+  const nextFajr = new Date(fajrTime.getTime() + 24 * 60 * 60 * 1000);
+  return {
+    currentPrayer: "Isha",
+    startTime: timings.Isha,
+    remainingTime: diffHM(cityNow, nextFajr),
+    nextPrayer: "Fajr",
+    nextStartTime: timings.Fajr
+  };
 };
 
-// Function to show the error card UI
+// Error card UI
 function showErrorCard() {
   document.getElementById("PrayerError").innerHTML = `
     <div class="error-overlay">
@@ -109,7 +119,6 @@ function showErrorCard() {
     </div>`;
 }
 
-
 function SearchCityName() {
   const cityInput = document.getElementById("cityInput").value.trim();
   if (!cityInput) return;
@@ -120,9 +129,10 @@ function SearchCityName() {
   fetch(`https://api.opencagedata.com/geocode/v1/json?q=${cityInput}&key=3968313623964ce893353132aee0eea0`)
     .then(r => r.json())
     .then(data => {
-      if (data.results && data.results.length > 0) {
+      if (data.results && data.results.length > 0 && data.results[0].annotations.timezone) {
         const { lat, lng } = data.results[0].geometry;
-        const timeZone = data.results[0].annotations.timezone.name;
+        const timeZone = data.results[0].annotations.timezone.name || "Asia/Karachi";
+
         return fetch(`https://api.aladhan.com/v1/timings?latitude=${lat}&longitude=${lng}&method=1&school=1`)
           .then(res => res.json())
           .then(timingData => ({ timingData, timeZone }));
@@ -135,10 +145,12 @@ function SearchCityName() {
       const { timingData, timeZone } = result;
       const timings = timingData.data.timings;
 
-      // Convert to 12-hour for display
+      // --- Clean timings and convert to 12-hour ---
       const convertedTimings = {};
       for (const [key, value] of Object.entries(timings)) {
-        convertedTimings[key] = convertTo12Hour(value);
+        const timeOnly = value.split(" ")[0];
+        convertedTimings[key] = convertTo12Hour(timeOnly);
+        timings[key] = timeOnly; // keep cleaned
       }
 
       const cityNow = getCityDate(timeZone);
@@ -150,9 +162,9 @@ function SearchCityName() {
         return;
       }
 
-      // Update Front Card
+      // Update front card
       document.getElementById("FrontTime").innerHTML = `
-        <p class="ImageText">${currentPrayer} - ${convertTo12Hour(startTime)}</p>
+        <p class="ImageText">${currentPrayer} - ${convertTo12Hour(startTime.split(" ")[0])}</p>
       `;
 
       document.getElementById("RemainingTime").innerHTML = `
@@ -160,11 +172,11 @@ function SearchCityName() {
           Time Remaining: ${remainingTime.hours} hr ${remainingTime.minutes} min
         </p>
         <p class="text-muted">
-          Next: <strong>${nextPrayer}</strong> at <strong>${convertTo12Hour(nextStartTime)}</strong>
+          Next: <strong>${nextPrayer}</strong> at <strong>${convertTo12Hour(nextStartTime.split(" ")[0])}</strong>
         </p>
       `;
 
-      // Update prayer list
+      // Update list
       document.getElementById("prayerTiming").innerHTML = `
         <div class="border border-2 border-dark rounded p-2 mt-3 prayerRow"><span class="prayerName">Fajr</span><span class="prayerTime">${convertedTimings.Fajr}</span></div>
         <div class="border border-2 border-dark rounded p-2 mt-3 prayerRow"><span class="prayerName">Dhuhr</span><span class="prayerTime">${convertedTimings.Dhuhr}</span></div>
