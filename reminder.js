@@ -4,29 +4,11 @@ if ("serviceWorker" in navigator) {
       .register("/serviceWorker.js")
       .then(res =>{
 
-Notification.requestPermission().then(res=>{
-    if(Notification.permission=='granted'){
-        console.log("Granted permission")
-        return
-    }
-    console.log(res)
-})
+
          console.log("service worker registered")})
       .catch(err => console.log("service worker not registered", err))
   })
 }
-
-
-navigator.serviceWorker.ready.then((Notification)=>{
-  let options = {
-   title: "Prayer Reminder",
-   body: "It's time for your prayer",
-    icon: "assets/icons/icon-48x48.png",
-  };
-  Notification.showNotification("prayerTime",options);
-})
-
-
 
 // Convert 24-hour to 12-hour format for display
 function convertTo12Hour(time24) {
