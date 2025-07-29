@@ -10,10 +10,6 @@ Just enter any city name to:
 
 ⏭ Know the next prayer and its time
 
-📱 Install as an app (works offline!)
-
-
-
 ---
 
 ✨ Features
