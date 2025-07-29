@@ -1,150 +1,98 @@
 body {
-  background: #F4F4F9 linear-gradient(#EDF2F7);
+  background-color: #f8fafc;
   font-family: 'Segoe UI', sans-serif;
 }
 
-/* Profile Image */
-.ImageBorder {
-  border: 2px solid black;
-  border-radius: 10px;
-  height: 100px;
-  width: 100px;
+.profile-pic {
+  height: 60px;
+  width: 60px;
+  border-radius: 50%;
   overflow: hidden;
-  display: flex;
-  align-items: center;
-  justify-content: center;    
+  border: 2px solid #ddd;
 }
-
-/* Prayer Card */
-.prayerCard {
-  border: 2px solid black;
-  border-radius: 16px;
-  background-color: white;
-  padding: 20px;
-  text-align: center;
-  width: 90%;
-  max-width: 300px;
-  margin: 0 auto;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-}
-
-.ImageText {
-  font-weight: bold;
-  font-size: 18px;
-  color: #333;
-  margin-bottom: 10px;
-}
-
-.MasjidImage {
-  width: 140px;
-  height: 140px;
+.profile-pic img {
+  width: 100%;
+  height: 100%;
   object-fit: cover;
-  opacity: 0.6;
-  display: block;
-  margin: 0 auto 10px;
 }
 
-.RemainingTime {
-  font-size: 14px;
-  color: #555;
-  font-weight: bold;
-  text-align: center;
-}
-
-/* Prayer Time Boxes */
-.PrayerTime {
+/* Search */
+.search-box {
   display: flex;
-  flex-direction: column;
-  margin-top: 30px;
-  padding: 0 20px;
-}
-
-.PrayerTime .prayerRow {
-  display: flex;
-  justify-content: space-between;
   align-items: center;
-}
-
-.prayerName {
-  font-weight: bold;
-  font-size: 16px;
-  color: #222;
-}
-
-.prayerTime {
-  font-weight: bold;
-  font-size: 15px;
-  color: #444;
-}
-
-
-
-/* Search Bar */
-.citySearchForm {
-  justify-content: center;
   gap: 10px;
 }
-
-.cityInput {
+#cityInput {
   flex: 1;
-  padding: 8px 12px;
   border-radius: 8px;
-  border: 1px solid #ccc;
-  font-size: 14px;
 }
-
-.citySearchBtn {
-  padding: 8px 16px;
+#searchButton {
   border-radius: 8px;
-  font-weight: bold;
-  background-color: #222;
-  color: white;
-  border: none;
-  transition: background-color 0.2s ease;
+}
+#spinnerChecker {
+  display: none;
 }
 
-.citySearchBtn:hover {
-  background-color: #000;
-  cursor: pointer;
+/* Cards */
+.main-card,
+.timings-card {
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+}
+.main-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.masjid-img {
+  width: 140px;
+  height: 140px;
+  opacity: 0.7;
 }
 
-/* Desktop layout */
-@media (min-width: 768px) {
-  .mainContentWrapper {
-    display: flex;
-    justify-content: flex-start;
-    align-items: flex-start;
-    padding: 40px 80px;
-    gap: 60px;
-  }
+#FrontTime p,
+#RemainingTime p {
+  margin: 0;
+}
 
-  .prayerCardWrapper {
-    flex: 1;
-    display: flex;
-    justify-content: flex-start;
-  }
+/* Prayer timings rows */
+#prayerTiming .prayerRow {
+  display: flex;
+  justify-content: space-between;
+  padding: 12px 0;
+  border-bottom: 1px solid #eee;
+}
+#prayerTiming .prayerRow:last-child {
+  border-bottom: none;
+}
 
-  .PrayerTime {
-    flex: 1;
-    margin-top: 0;
-  }
+/* Error overlay */
+.error-overlay {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background-color: #f4f9ff;
+  z-index: 9999;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.error-card {
+  max-width: 360px;
+  width: 90%;
+  background-color: #ffffff;
+  border-radius: 12px;
+}
 
-  .prayerCard {
-    margin: 0;
-    max-width: 360px;
-    padding: 30px;
-  }
+/* Prevent scrolling when error shown */
+body.error-active {
+  overflow: hidden;
+}
 
-  .MasjidImage {
-    width: 160px;
-    height: 160px;
-  }
-
-  .ImageText {
-    font-size: 20px;
-  }
-
-  .RemainingTime {
-    font-size: 16px;
+/* Responsive */
+@media (max-width: 768px) {
+  .main-card, .timings-card {
+    padding: 20px;
   }
 }

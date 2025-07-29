@@ -3,85 +3,59 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Reminder App</title>
-   <link rel="icon" href="./Assests/islamic.png" type="image/x-icon" />
+  <title>Prayer Reminder</title>
+  <link rel="manifest" href="manifest.json" />
+<!-- ios support -->
+<link rel="apple-touch-icon" href="Assests/icons/icon-48x48.png" />
+<link rel="apple-touch-icon" href="Assests/icons/icon-72x72.png" />
+<link rel="apple-touch-icon" href="Assests/icons/icon-96x96.png" />
+<link rel="apple-touch-icon" href="Assests/icons/icon-128x128.png" />
+<link rel="apple-touch-icon" href="Assests/icons/icon-144x144.png" />
+<link rel="apple-touch-icon" href="Assests/icons/icon-152x152.png" />
+<link rel="apple-touch-icon" href="Assests/icons/icon-192x192.png" />
+<link rel="apple-touch-icon" href="Assests/icons/icon-384x384.png" />
+<link rel="apple-touch-icon" href="Assests/icons/icon-512x512.png" />
+<meta name="apple-mobile-web-app-status-bar" content="#db4938" />
+
+<meta name="theme-color" content="#db4938" />
+  <link rel="icon" href="./Assests/islamic.png" type="image/x-icon" />
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <div id="PrayerError"></div>
-  <div class="backgroundColor container-fluid">
-    
-    <!-- Navbar -->
-    <nav class="mt-5 navStart navbar navbar-expand-lg">
-      <div class="container-fluid">
-        <div class="d-flex align-items-center">
-          <div class="rounded-circle border border-black ImageBorder ms-2">
-            <img class="profileImage" src="https://img.freepik.com/premium-vector/person-icon_109161-4674.jpg" alt="image" style="width:100%; height:100%; object-fit:cover;">
-          </div>
-          <span class="userText ms-3 fw-bold text-bold">Hello User!</span>
-        </div>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent">
-          <span class="navbar-toggler-icon"></span>
-        </button>  
+
+  <div class="container py-4">
+    <!-- Profile -->
+    <div class="d-flex align-items-center mb-4">
+      <div class="profile-pic me-3">
+        <img src="https://img.freepik.com/premium-vector/person-icon_109161-4674.jpg" alt="profile">
       </div>
-    </nav>
-<div id="PrayerError"></div>
-    <!-- City Search Input -->
-    <div class="container mt-4 d-flex justify-content-center">
-      <div class="d-flex w-100 citySearchForm " style="max-width: 400px;">
-        <input
-          type="text"
-          class="form-control me-2 cityInput"
-          placeholder="City name"
-          id="cityInput"
-          required
-        />
-        <div id="loader"> 
-        <button onclick="SearchCityName()" class="btn btn-dark citySearchBtn" id="searchButton" >Search</button>
-      <span id="spinnerChecker" class="spinner-border" role="status"></span> 
-      </div>
-        
-        
-      
-      </div>
+      <h5 class="mb-0 fw-bold text-dark">Hello User!</h5>
     </div>
 
-    <!-- Main Content Wrapper -->
-    <div class="mainContentWrapper mt-4">
-      <div class="prayerCardWrapper">
-        <!-- Left: Main Prayer Card -->
-        <div class="prayerCard">
-          <div id="FrontTime">
-          <p class="ImageText">Zuhr - 1:15 PM</p>
-          </div>
-          <img src="./Assests/islamic.png" alt="Masjid" class="MasjidImage">
-          <div id="RemainingTime">
-          <p class="RemainingTime text-bold">Time Remaining: 1 hr 15 min</p>
+    <!-- Search -->
+    <div class="search-box mb-4">
+      <input type="text" id="cityInput" class="form-control" placeholder="Enter city name">
+      <button class="btn btn-primary" id="searchButton" onclick="SearchCityName()">Search</button>
+      <div class="spinner-border text-primary ms-2" id="spinnerChecker" role="status"></div>
+    </div>
+
+    <!-- Content -->
+    <div class="row g-4" id="mainContent">
+      <!-- Left card -->
+      <div class="col-lg-4">
+        <div class="main-card text-center p-4">
+          <div id="FrontTime"></div>
+          <img src="./Assests/islamic.png" class="masjid-img" alt="Masjid">
+          <div id="RemainingTime" class="mt-3"></div>
         </div>
       </div>
 
-      <!-- Right: Prayer Time Boxes -->
-      <div   id="prayerTiming" class="PrayerTime">
-        <div class="border border-2 border-dark rounded p-2 mt-3 prayerRow">
-          <span class="prayerName  text-center"> Put a city name</span>
-  
-        </div>
-        <div class="border border-2 border-dark rounded p-2 mt-3 prayerRow">
-          <span class="prayerName">put a city name</span>
-          
-        </div>
-        <div class="border border-2 border-dark rounded p-2 mt-3 prayerRow">
-          <span class="prayerName">put a city name</span>
-          
-        </div>
-        <div class="border border-2 border-dark rounded p-2 mt-3 prayerRow">
-          <span class="prayerName">put a city name</span>
-          
-        </div>
-        <div class="border border-2 border-dark rounded p-2 mt-3 prayerRow">
-          <span class="prayerName">put a city name</span>
-          
+      <!-- Prayer timings -->
+      <div class="col-lg-8">
+        <div class="timings-card p-4" id="prayerTiming">
+          <p class="text-muted mb-0">Search a city to see prayer timings.</p>
         </div>
       </div>
     </div>
