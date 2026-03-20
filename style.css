@@ -1,98 +1,415 @@
+/* =====================
+   Variables & Reset
+   ===================== */
+:root {
+  --bg:        #0f0f1a;
+  --bg2:       #16162a;
+  --card:      #1c1c32;
+  --card2:     #23233d;
+  --accent:    #c9a84c;
+  --accent2:   #e8c76a;
+  --glow:      rgba(201,168,76,0.12);
+  --text:      #f0eef8;
+  --muted:     #9b98b8;
+  --dim:       #5c5a78;
+  --border:    rgba(255,255,255,0.07);
+  --r:         16px;
+  --r-sm:      10px;
+  --header-h:  62px;
+  --font:      'Plus Jakarta Sans', sans-serif;
+  --font-d:    'Amiri', serif;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { -webkit-tap-highlight-color: transparent; }
 body {
-  background-color: #f8fafc;
-  font-family: 'Segoe UI', sans-serif;
+  background: var(--bg);
+  font-family: var(--font);
+  color: var(--text);
+  min-height: 100svh;
 }
 
-.profile-pic {
-  height: 60px;
-  width: 60px;
-  border-radius: 50%;
+/* =====================
+   Header
+   ===================== */
+.app-header {
+  position: sticky; top: 0; z-index: 100;
+  height: var(--header-h);
+  background: rgba(15,15,26,0.95);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 18px;
+  gap: 12px;
+}
+
+/* Logo */
+.header-left {
+  display: flex; align-items: center; gap: 10px; flex-shrink: 0;
+}
+.logo-wrap {
+  width: 38px; height: 38px;
+  background: rgba(201,168,76,0.08);
+  border: 1px solid rgba(201,168,76,0.2);
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
   overflow: hidden;
-  border: 2px solid #ddd;
 }
-.profile-pic img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+.header-logo {
+  width: 26px; height: 26px;
+  object-fit: contain;
+  filter: brightness(0) invert(1) sepia(1) saturate(2) hue-rotate(10deg);
+  opacity: 0.9;
 }
+.header-text { display: flex; flex-direction: column; gap: 1px; }
+.app-name {
+  font-family: var(--font-d);
+  font-size: 19px; font-weight: 700;
+  color: var(--text); line-height: 1;
+  letter-spacing: 0.01em;
+}
+.city-badge {
+  font-size: 10px; font-weight: 600;
+  color: var(--accent);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  min-height: 12px;
+  transition: opacity 0.3s;
+}
+.city-badge:empty { opacity: 0; }
 
 /* Search */
-.search-box {
-  display: flex;
-  align-items: center;
-  gap: 10px;
+.header-right {
+  display: flex; align-items: center; gap: 8px;
 }
-#cityInput {
-  flex: 1;
-  border-radius: 8px;
+/* The icon-only toggle button — always visible */
+.search-icon-btn {
+  background: var(--card2);
+  border: 1px solid var(--border);
+  color: var(--muted);
+  width: 40px; height: 40px;
+  border-radius: var(--r-sm);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  transition: color 0.2s, border-color 0.2s;
+  flex-shrink: 0;
 }
-#searchButton {
-  border-radius: 8px;
-}
-#spinnerChecker {
-  display: none;
+.search-icon-btn:hover,
+.search-icon-btn.active {
+  color: var(--accent);
+  border-color: rgba(201,168,76,0.4);
 }
 
-/* Cards */
-.main-card,
-.timings-card {
-  background: #fff;
-  border-radius: 16px;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+/* Expanding search bar — hidden by default */
+.search-expand {
+  display: flex; align-items: center; gap: 6px;
+  max-width: 0; overflow: hidden; opacity: 0;
+  transition: max-width 0.4s cubic-bezier(0.4,0,0.2,1), opacity 0.3s;
 }
-.main-card {
+.search-expand.open {
+  max-width: 280px; opacity: 1;
+}
+.search-input {
+  background: var(--card2);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-family: var(--font); font-size: 14px;
+  padding: 9px 14px;
+  border-radius: var(--r-sm);
+  width: 190px; outline: none;
+  transition: border-color 0.2s;
+}
+.search-input::placeholder { color: var(--dim); }
+.search-input:focus { border-color: rgba(201,168,76,0.5); }
+
+.btn-go {
+  background: var(--accent);
+  border: none; color: #1a1500;
+  width: 38px; height: 38px;
+  border-radius: var(--r-sm);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.15s;
+  flex-shrink: 0;
+}
+.btn-go:hover { background: var(--accent2); }
+.btn-go:active { transform: scale(0.95); }
+
+.spinner {
+  display: none;
+  width: 20px; height: 20px;
+  border: 2px solid var(--border);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  flex-shrink: 0;
+}
+.spinner.active { display: block; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* =====================
+   Layout — Mobile first
+   ===================== */
+.app-main {
+  padding: 18px 16px 36px;
   display: flex;
   flex-direction: column;
-  align-items: center;
+  gap: 16px;
+  max-width: 480px;
+  margin: 0 auto;
 }
-.masjid-img {
-  width: 140px;
-  height: 140px;
-  opacity: 0.7;
-}
-
-#FrontTime p,
-#RemainingTime p {
-  margin: 0;
+.right-panel {
+  display: flex; flex-direction: column; gap: 12px;
 }
 
-/* Prayer timings rows */
-#prayerTiming .prayerRow {
-  display: flex;
-  justify-content: space-between;
-  padding: 12px 0;
-  border-bottom: 1px solid #eee;
-}
-#prayerTiming .prayerRow:last-child {
-  border-bottom: none;
-}
-
-/* Error overlay */
-.error-overlay {
-  position: fixed;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
-  background-color: #f4f9ff;
-  z-index: 9999;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-.error-card {
-  max-width: 360px;
-  width: 90%;
-  background-color: #ffffff;
-  border-radius: 12px;
-}
-
-/* Prevent scrolling when error shown */
-body.error-active {
+/* =====================
+   Hero Card
+   ===================== */
+.hero-card {
+  position: relative;
+  border-radius: 22px;
   overflow: hidden;
+  padding: 28px 22px 24px;
+  background: linear-gradient(145deg, #1d1840 0%, #241b50 40%, #182038 100%);
+  border: 1px solid rgba(201,168,76,0.14);
+  box-shadow: 0 8px 40px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.04);
+}
+.hero-bg-glow {
+  position: absolute; inset: 0; pointer-events: none;
+  background:
+    radial-gradient(ellipse at 75% 15%, rgba(201,168,76,0.1) 0%, transparent 55%),
+    radial-gradient(ellipse at 20% 85%, rgba(80,60,180,0.08) 0%, transparent 55%);
+}
+.hero-content {
+  position: relative; z-index: 1;
+  display: flex; flex-direction: column;
+  align-items: center; text-align: center; gap: 4px;
 }
 
-/* Responsive */
-@media (max-width: 768px) {
-  .main-card, .timings-card {
-    padding: 20px;
+.current-prayer-label {
+  font-size: 11px; font-weight: 600;
+  letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--accent); opacity: 0.85;
+}
+.current-prayer-time {
+  font-family: var(--font-d);
+  font-size: 50px; font-weight: 700;
+  color: var(--text); line-height: 1;
+  letter-spacing: -1px; margin: 4px 0 10px;
+}
+
+/* Logo circle in hero */
+.logo-circle {
+  width: 80px; height: 80px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(201,168,76,0.15);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  margin: 4px 0 12px;
+  box-shadow: 0 0 24px rgba(201,168,76,0.1);
+}
+.logo-circle img {
+  width: 50px; height: 50px;
+  object-fit: contain;
+  filter: brightness(0) invert(1) sepia(0.3) saturate(1.5) hue-rotate(10deg);
+  opacity: 0.88;
+}
+
+.remaining-label {
+  font-size: 11px; color: var(--muted); margin-bottom: 2px;
+  letter-spacing: 0.04em;
+}
+.remaining-time-big {
+  font-size: 26px; font-weight: 700; color: var(--text);
+  letter-spacing: -0.5px; line-height: 1;
+}
+.remaining-sub {
+  font-size: 12px; color: var(--muted); margin-top: 4px;
+}
+.remaining-sub strong { color: var(--accent); }
+
+.next-prayer-pill {
+  margin-top: 10px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid var(--border);
+  border-radius: 20px; padding: 5px 16px;
+  font-size: 12px; color: var(--muted);
+  display: none;
+}
+.next-prayer-pill.visible { display: inline-block; }
+.next-prayer-pill strong { color: var(--accent); }
+
+/* =====================
+   Date Row
+   ===================== */
+.date-row {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 12px; color: var(--dim); font-weight: 500;
+  letter-spacing: 0.02em; padding-left: 2px;
+}
+.dot-sep { color: var(--accent); font-size: 14px; }
+
+/* =====================
+   Prayer Cards
+   ===================== */
+.prayers-grid { display: flex; flex-direction: column; gap: 8px; }
+
+.prayer-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  padding: 13px 16px;
+  display: flex; align-items: center;
+  justify-content: space-between;
+  transition: border-color 0.2s, transform 0.2s;
+  animation: slideUp 0.4s both;
+}
+.prayer-card:nth-child(1) { animation-delay: 0.04s; }
+.prayer-card:nth-child(2) { animation-delay: 0.09s; }
+.prayer-card:nth-child(3) { animation-delay: 0.14s; }
+.prayer-card:nth-child(4) { animation-delay: 0.19s; }
+.prayer-card:nth-child(5) { animation-delay: 0.24s; }
+
+@keyframes slideUp {
+  from { opacity:0; transform: translateY(10px); }
+  to   { opacity:1; transform: translateY(0); }
+}
+.prayer-card.active-prayer {
+  background: linear-gradient(135deg, #241d44, #1c2a40);
+  border-color: rgba(201,168,76,0.3);
+  box-shadow: 0 4px 20px rgba(201,168,76,0.07);
+}
+.prayer-card:hover { border-color: rgba(201,168,76,0.18); }
+
+.prayer-left { display: flex; align-items: center; gap: 12px; }
+.prayer-emoji {
+  font-size: 18px;
+  width: 34px; height: 34px;
+  background: var(--card2);
+  border-radius: 9px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.prayer-card.active-prayer .prayer-emoji { background: var(--glow); }
+
+.prayer-name-en { font-size: 14px; font-weight: 600; color: var(--text); }
+.prayer-name-ar { font-family: var(--font-d); font-size: 12px; color: var(--dim); margin-top: 1px; }
+.prayer-card.active-prayer .prayer-name-en { color: var(--accent); }
+
+.prayer-right { display: flex; align-items: center; gap: 9px; }
+.prayer-time-text {
+  font-size: 15px; font-weight: 700; color: var(--text);
+  font-variant-numeric: tabular-nums; letter-spacing: -0.2px;
+}
+.active-dot {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 7px var(--accent);
+  display: none;
+  animation: blink 1.6s ease-in-out infinite;
+}
+.prayer-card.active-prayer .active-dot { display: block; }
+@keyframes blink {
+  0%,100% { opacity:1; transform:scale(1); }
+  50%      { opacity:0.4; transform:scale(0.65); }
+}
+
+/* =====================
+   Empty State
+   ===================== */
+.empty-state {
+  text-align: center; padding: 30px 16px;
+  color: var(--dim); font-size: 13px;
+}
+.empty-icon { font-size: 36px; margin-bottom: 10px; opacity: 0.5; }
+.empty-state.hidden { display: none; }
+
+/* =====================
+   Error Modal
+   ===================== */
+.modal-hidden { display: none !important; }
+.modal-overlay {
+  position: fixed; inset: 0; z-index: 9999;
+  background: rgba(0,0,0,0.72);
+  backdrop-filter: blur(10px);
+  display: flex; align-items: center; justify-content: center;
+}
+.modal-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 30px 26px;
+  max-width: 310px; width: 90%;
+  text-align: center;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+  animation: popIn 0.3s cubic-bezier(0.34,1.56,0.64,1);
+}
+@keyframes popIn {
+  from { opacity:0; transform:scale(0.85); }
+  to   { opacity:1; transform:scale(1); }
+}
+.modal-icon { font-size: 40px; margin-bottom: 10px; }
+.modal-card h3 { font-size: 17px; font-weight: 700; margin-bottom: 8px; }
+.modal-card p  { font-size: 13px; color: var(--muted); line-height: 1.6; margin-bottom: 18px; }
+.btn-retry {
+  background: var(--accent); color: #1a1500;
+  border: none; border-radius: var(--r-sm);
+  padding: 10px 26px; font-size: 14px; font-weight: 700;
+  font-family: var(--font); cursor: pointer;
+  transition: background 0.2s;
+}
+.btn-retry:hover { background: var(--accent2); }
+
+/* =====================
+   Desktop Layout (≥768px)
+   ===================== */
+@media (min-width: 768px) {
+  html, body { height: 100%; overflow: hidden; }
+  body { display: flex; flex-direction: column; }
+
+  .app-main {
+    flex: 1;
+    max-width: 100%;
+    margin: 0;
+    padding: 20px 32px;
+    display: grid;
+    grid-template-columns: 320px 1fr;
+    grid-template-rows: 1fr;
+    gap: 20px;
+    align-items: stretch;
+    overflow: hidden;
   }
+
+  .hero-card {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 32px 26px;
+  }
+  .hero-content { height: 100%; justify-content: center; }
+  .current-prayer-time { font-size: 46px; }
+
+  .right-panel {
+    display: flex; flex-direction: column;
+    gap: 14px;
+    overflow: hidden;
+  }
+
+  .prayers-grid { gap: 9px; }
+  .prayer-card { padding: 14px 18px; }
+
+  .search-input { width: 200px; }
+}
+
+/* =====================
+   Small phones
+   ===================== */
+@media (max-width: 360px) {
+  .current-prayer-time { font-size: 42px; }
+  .logo-circle { width: 68px; height: 68px; }
+  .logo-circle img { width: 42px; height: 42px; }
+  .search-input { width: 145px; }
 }

@@ -3,66 +3,95 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Prayer Reminder</title>
+  <title>Prayer Times</title>
   <link rel="manifest" href="manifest.json" />
-<!-- ios support -->
-<link rel="apple-touch-icon" href="assets/icons/icon-48x48.png" />
-<link rel="apple-touch-icon" href="assets/icons/icon-72x72.png" />
-<link rel="apple-touch-icon" href="assets/icons/icon-96x96.png" />
-<link rel="apple-touch-icon" href="assets/icons/icon-128x128.png" />
-<link rel="apple-touch-icon" href="assets/icons/icon-144x144.png" />
-<link rel="apple-touch-icon" href="assets/icons/icon-152x152.png" />
-<link rel="apple-touch-icon" href="assets/icons/icon-192x192.png" />
-<link rel="apple-touch-icon" href="assets/icons/icon-384x384.png" />
-<link rel="apple-touch-icon" href="assets/icons/icon-512x512.png" />
-<meta name="apple-mobile-web-app-status-bar" content="#db4938" />
-
-<meta name="theme-color" content="#db4938" />
+  <link rel="apple-touch-icon" href="assets/icons/icon-192x192.png" />
+  <meta name="apple-mobile-web-app-status-bar" content="#0f0f1a" />
+  <meta name="theme-color" content="#0f0f1a" />
   <link rel="icon" href="./assets/islamic.png" type="image/x-icon" />
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div id="PrayerError"></div>
 
-  <div class="container py-4">
-    <!-- Profile -->
-    <div class="d-flex align-items-center mb-4">
-      <div class="profile-pic me-3">
-        <img src="https://img.freepik.com/premium-vector/person-icon_109161-4674.jpg" alt="profile">
-      </div>
-      <h5 class="mb-0 fw-bold text-dark">Hello User!</h5>
-    </div>
-
-    <!-- Search -->
-    <div class="search-box mb-4">
-      <input type="text" id="cityInput" class="form-control" placeholder="Enter city name">
-      <button class="btn btn-primary" id="searchButton" onclick="SearchCityName()">Search</button>
-      <div class="spinner-border text-primary ms-2" id="spinnerChecker" role="status"></div>
-    </div>
-
-    <!-- Content -->
-    <div class="row g-4" id="mainContent">
-      <!-- Left card -->
-      <div class="col-lg-4">
-        <div class="main-card text-center p-4">
-          <div id="FrontTime"></div>
-          <img src="./assets/islamic.png" class="masjid-img" alt="Masjid">
-          <div id="RemainingTime" class="mt-3"></div>
-        </div>
-      </div>
-
-      <!-- Prayer timings -->
-      <div class="col-lg-8">
-        <div class="timings-card p-4" id="prayerTiming">
-          <p class="text-muted mb-0">Search a city to see prayer timings.</p>
-        </div>
-      </div>
+  <!-- Error Modal -->
+  <div id="errorModal" class="modal-overlay modal-hidden">
+    <div class="modal-card">
+      <div class="modal-icon">⚠️</div>
+      <h3>City Not Found</h3>
+      <p>Prayer times are not available for this city. Please check spelling and try again.</p>
+      <button onclick="closeError()" class="btn-retry">Try Again</button>
     </div>
   </div>
 
-  <script  src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
- 
+  <!-- Header -->
+  <header class="app-header">
+    <div class="header-left">
+      <div class="logo-wrap">
+        <img src="./assets/islamic.png" class="header-logo" alt="logo">
+      </div>
+      <div class="header-text">
+        <span class="app-name">PrayerTime</span>
+        <span class="city-badge" id="cityBadge"></span>
+      </div>
+    </div>
+    <div class="header-right">
+      <!-- Only icon shown by default -->
+      <button class="search-icon-btn" id="searchToggleBtn" onclick="toggleSearch()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z"/>
+        </svg>
+      </button>
+      <!-- Hidden search bar -->
+      <div class="search-expand" id="searchExpand">
+        <input type="text" id="cityInput" class="search-input" placeholder="Enter city name..." />
+        <div class="spinner" id="spinnerChecker"></div>
+        <button class="btn-go" id="searchButton" onclick="SearchCityName()">
+          <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main -->
+  <main class="app-main">
+
+    <!-- Hero Card -->
+    <div class="hero-card" id="heroCard">
+      <div class="hero-bg-glow"></div>
+      <div class="hero-content">
+        <div class="current-prayer-label" id="currentPrayerLabel">—</div>
+        <div class="current-prayer-time" id="currentPrayerTime">—</div>
+        <div class="logo-circle">
+          <img src="./assets/islamic.png" alt="Masjid">
+        </div>
+        <div class="remaining-block" id="remainingBlock">
+          <div class="remaining-label">Search a city to begin</div>
+        </div>
+        <div class="next-prayer-pill" id="nextPrayerBlock"></div>
+      </div>
+    </div>
+
+    <!-- Right panel (date + prayers) -->
+    <div class="right-panel">
+      <div class="date-row" id="dateRow">
+        <span id="liveDate"></span>
+        <span class="dot-sep">·</span>
+        <span id="liveClock"></span>
+      </div>
+      <div class="prayers-grid" id="prayerGrid"></div>
+      <div class="empty-state" id="emptyState">
+        <div class="empty-icon">🔍</div>
+        <p>Search your city to see prayer times</p>
+      </div>
+    </div>
+
+  </main>
+
   <script src="reminder.js"></script>
 </body>
 </html>
