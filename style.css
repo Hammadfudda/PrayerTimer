@@ -1,419 +1,460 @@
-/* =====================
-   Variables & Reset
-   ===================== */
+/* ===========================
+   ROOT & RESET
+   =========================== */
 :root {
-  --bg:        #0f0f1a;
-  --bg2:       #16162a;
-  --card:      #1c1c32;
-  --card2:     #23233d;
-  --accent:    #c9a84c;
-  --accent2:   #e8c76a;
-  --glow:      rgba(201,168,76,0.12);
-  --text:      #f0eef8;
-  --muted:     #9b98b8;
-  --dim:       #5c5a78;
-  --border:    rgba(255,255,255,0.07);
-  --r:         16px;
-  --r-sm:      10px;
-  --header-h:  62px;
-  --font:      'Plus Jakarta Sans', sans-serif;
-  --font-d:    'Amiri', serif;
-}
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html { -webkit-tap-highlight-color: transparent; }
-body {
-  background: var(--bg);
-  font-family: var(--font);
-  color: var(--text);
-  min-height: 100svh;
-  min-height: 100vh;
-  background-attachment: fixed;
+  --bg:       #0f0f1a;
+  --card:     #1c1c32;
+  --card2:    #23233d;
+  --accent:   #c9a84c;
+  --accent2:  #e8c76a;
+  --glow:     rgba(201,168,76,0.1);
+  --text:     #f0eef8;
+  --muted:    #9b98b8;
+  --dim:      #5c5a78;
+  --border:   rgba(255,255,255,0.07);
+  --r:        16px;
+  --rsm:      10px;
+  --hh:       60px;
+  --f:        'Plus Jakarta Sans', sans-serif;
+  --fd:       'Amiri', serif;
 }
 
-/* =====================
-   Header
-   ===================== */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0; padding: 0;
+}
+
+html {
+  overflow-x: hidden;
+  -webkit-tap-highlight-color: transparent;
+  height: 100%;
+}
+
+body {
+  font-family: var(--f);
+  background: var(--bg);
+  color: var(--text);
+  overflow-x: hidden;
+  min-height: 100%;
+  width: 100%;
+  position: relative;
+}
+
+/* ===========================
+   HEADER
+   =========================== */
 .app-header {
-  position: sticky; top: 0; z-index: 100;
-  height: var(--header-h);
-  background: rgba(15,15,26,0.95);
+  position: sticky; top: 0; z-index: 200;
+  height: var(--hh);
+  display: flex; align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  background: rgba(15,15,26,0.97);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border-bottom: 1px solid var(--border);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 18px;
-  gap: 12px;
-}
-
-/* Logo */
-.header-left {
-  display: flex; align-items: center; gap: 10px; flex-shrink: 0;
-}
-.logo-wrap {
-  width: 38px; height: 38px;
-  background: rgba(201,168,76,0.08);
-  border: 1px solid rgba(201,168,76,0.2);
-  border-radius: 10px;
-  display: flex; align-items: center; justify-content: center;
+  /* prevent header itself from causing overflow */
   overflow: hidden;
 }
+
+.header-left {
+  display: flex; align-items: center;
+  gap: 10px; flex-shrink: 0;
+  min-width: 0;
+}
+
+.logo-wrap {
+  width: 36px; height: 36px; flex-shrink: 0;
+  background: rgba(201,168,76,0.07);
+  border: 1px solid rgba(201,168,76,0.18);
+  border-radius: 9px;
+  display: flex; align-items: center; justify-content: center;
+}
+
 .header-logo {
-  width: 26px; height: 26px;
+  width: 24px; height: 24px;
   object-fit: contain;
-  filter: brightness(0) invert(1) sepia(1) saturate(2) hue-rotate(10deg);
+  filter: brightness(0) invert(1) sepia(1) saturate(2) hue-rotate(5deg);
   opacity: 0.9;
 }
-.header-text { display: flex; flex-direction: column; gap: 1px; }
-.app-name {
-  font-family: var(--font-d);
-  font-size: 19px; font-weight: 700;
-  color: var(--text); line-height: 1;
-  letter-spacing: 0.01em;
+
+.header-text {
+  display: flex; flex-direction: column;
+  gap: 1px; min-width: 0;
 }
+
+.app-name {
+  font-family: var(--fd);
+  font-size: 18px; font-weight: 700;
+  color: var(--text); line-height: 1;
+}
+
 .city-badge {
   font-size: 10px; font-weight: 600;
   color: var(--accent);
-  letter-spacing: 0.08em;
   text-transform: uppercase;
-  min-height: 12px;
-  transition: opacity 0.3s;
+  letter-spacing: 0.07em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 140px;
+  display: block;
+  min-height: 13px;
 }
 .city-badge:empty { opacity: 0; }
 
-/* Search */
+/* Search right side */
 .header-right {
-  display: flex; align-items: center; gap: 8px;
-}
-/* The icon-only toggle button — always visible */
-.search-icon-btn {
-  background: var(--card2);
-  border: 1px solid var(--border);
-  color: var(--muted);
-  width: 40px; height: 40px;
-  border-radius: var(--r-sm);
-  display: flex; align-items: center; justify-content: center;
-  cursor: pointer;
-  transition: color 0.2s, border-color 0.2s;
-  flex-shrink: 0;
-  order: 2;
-}
-.search-icon-btn:hover,
-.search-icon-btn.active {
-  color: var(--accent);
-  border-color: rgba(201,168,76,0.4);
+  display: flex; align-items: center;
+  gap: 8px; flex-shrink: 0;
 }
 
-/* Expanding search bar — hidden by default, appears to the LEFT of toggle btn */
+/* Expanding search — hidden by default */
 .search-expand {
   display: flex; align-items: center; gap: 6px;
-  max-width: 0; overflow: hidden; opacity: 0;
-  transition: max-width 0.4s cubic-bezier(0.4,0,0.2,1), opacity 0.3s;
-  order: 1;
+  overflow: hidden;
+  max-width: 0; opacity: 0;
+  transition: max-width 0.38s cubic-bezier(0.4,0,0.2,1), opacity 0.3s;
 }
 .search-expand.open {
-  max-width: 260px; opacity: 1;
+  /* On mobile: keep it narrower to avoid overflow */
+  max-width: 220px; opacity: 1;
 }
+
 .search-input {
   background: var(--card2);
   border: 1px solid var(--border);
   color: var(--text);
-  font-family: var(--font); font-size: 14px;
-  padding: 9px 14px;
-  border-radius: var(--r-sm);
-  width: 190px; outline: none;
+  font-family: var(--f); font-size: 14px;
+  padding: 8px 12px;
+  border-radius: var(--rsm);
+  /* Fixed width — smaller so it doesn't overflow on small screens */
+  width: 155px;
+  outline: none;
   transition: border-color 0.2s;
+  flex-shrink: 0;
 }
 .search-input::placeholder { color: var(--dim); }
-.search-input:focus { border-color: rgba(201,168,76,0.5); }
+.search-input:focus { border-color: rgba(201,168,76,0.45); }
 
 .btn-go {
   background: var(--accent);
   border: none; color: #1a1500;
-  width: 38px; height: 38px;
-  border-radius: var(--r-sm);
+  width: 36px; height: 36px; flex-shrink: 0;
+  border-radius: var(--rsm);
   display: flex; align-items: center; justify-content: center;
   cursor: pointer;
   transition: background 0.2s, transform 0.15s;
-  flex-shrink: 0;
 }
-.btn-go:hover { background: var(--accent2); }
-.btn-go:active { transform: scale(0.95); }
+.btn-go:hover  { background: var(--accent2); }
+.btn-go:active { transform: scale(0.94); }
 
 .spinner {
   display: none;
-  width: 20px; height: 20px;
+  width: 20px; height: 20px; flex-shrink: 0;
   border: 2px solid var(--border);
   border-top-color: var(--accent);
   border-radius: 50%;
   animation: spin 0.7s linear infinite;
-  flex-shrink: 0;
 }
 .spinner.active { display: block; }
 @keyframes spin { to { transform: rotate(360deg); } }
 
-/* =====================
-   Layout — Mobile first
-   ===================== */
+/* Toggle icon button */
+.search-icon-btn {
+  background: var(--card2);
+  border: 1px solid var(--border);
+  color: var(--muted);
+  width: 38px; height: 38px; flex-shrink: 0;
+  border-radius: var(--rsm);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  transition: color 0.2s, border-color 0.2s;
+}
+.search-icon-btn:hover,
+.search-icon-btn.active {
+  color: var(--accent);
+  border-color: rgba(201,168,76,0.35);
+}
+
+/* ===========================
+   MOBILE LAYOUT (default)
+   =========================== */
 .app-main {
-  padding: 18px 16px 36px;
   display: flex;
   flex-direction: column;
   gap: 16px;
-  max-width: 480px;
-  margin: 0 auto;
-}
-.right-panel {
-  display: flex; flex-direction: column; gap: 12px;
+  padding: 16px 14px 32px;
+  width: 100%;
 }
 
-/* =====================
-   Hero Card
-   ===================== */
+.right-panel {
+  display: flex; flex-direction: column; gap: 12px;
+  width: 100%;
+}
+
+/* ===========================
+   HERO CARD
+   =========================== */
 .hero-card {
   position: relative;
-  border-radius: 22px;
+  border-radius: 20px;
   overflow: hidden;
-  padding: 28px 22px 24px;
-  background: linear-gradient(145deg, #1d1840 0%, #241b50 40%, #182038 100%);
-  border: 1px solid rgba(201,168,76,0.14);
-  box-shadow: 0 8px 40px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.04);
+  padding: 26px 20px 22px;
+  background: linear-gradient(145deg, #1d1840 0%, #241b50 45%, #182038 100%);
+  border: 1px solid rgba(201,168,76,0.13);
+  box-shadow: 0 8px 36px rgba(0,0,0,0.4);
+  width: 100%;
 }
-.hero-bg-glow {
+
+.hero-glow {
   position: absolute; inset: 0; pointer-events: none;
   background:
-    radial-gradient(ellipse at 75% 15%, rgba(201,168,76,0.1) 0%, transparent 55%),
-    radial-gradient(ellipse at 20% 85%, rgba(80,60,180,0.08) 0%, transparent 55%);
+    radial-gradient(ellipse at 80% 15%, rgba(201,168,76,0.09) 0%, transparent 55%),
+    radial-gradient(ellipse at 15% 85%, rgba(80,60,180,0.07) 0%, transparent 55%);
 }
+
 .hero-content {
   position: relative; z-index: 1;
   display: flex; flex-direction: column;
-  align-items: center; text-align: center; gap: 4px;
+  align-items: center; text-align: center;
+  gap: 4px;
 }
 
-.current-prayer-label {
+.prayer-label {
   font-size: 11px; font-weight: 600;
   letter-spacing: 0.14em; text-transform: uppercase;
   color: var(--accent); opacity: 0.85;
 }
-.current-prayer-time {
-  font-family: var(--font-d);
-  font-size: 50px; font-weight: 700;
+
+.prayer-time {
+  font-family: var(--fd);
+  font-size: 48px; font-weight: 700;
   color: var(--text); line-height: 1;
-  letter-spacing: -1px; margin: 4px 0 10px;
+  letter-spacing: -1px;
+  margin: 4px 0 10px;
 }
 
-/* Logo circle in hero */
 .logo-circle {
-  width: 80px; height: 80px;
+  width: 76px; height: 76px;
   background: rgba(255,255,255,0.04);
-  border: 1px solid rgba(201,168,76,0.15);
+  border: 1px solid rgba(201,168,76,0.14);
   border-radius: 50%;
   display: flex; align-items: center; justify-content: center;
-  margin: 4px 0 12px;
-  box-shadow: 0 0 24px rgba(201,168,76,0.1);
+  margin: 2px 0 12px;
+  box-shadow: 0 0 20px rgba(201,168,76,0.09);
 }
 .logo-circle img {
-  width: 50px; height: 50px;
+  width: 46px; height: 46px;
   object-fit: contain;
-  filter: brightness(0) invert(1) sepia(0.3) saturate(1.5) hue-rotate(10deg);
-  opacity: 0.88;
+  filter: brightness(0) invert(1) sepia(0.2) saturate(1.4);
+  opacity: 0.87;
 }
 
-.remaining-label {
-  font-size: 11px; color: var(--muted); margin-bottom: 2px;
-  letter-spacing: 0.04em;
-}
-.remaining-time-big {
-  font-size: 26px; font-weight: 700; color: var(--text);
-  letter-spacing: -0.5px; line-height: 1;
-}
-.remaining-sub {
-  font-size: 12px; color: var(--muted); margin-top: 4px;
-}
-.remaining-sub strong { color: var(--accent); }
+.rem-hint { font-size: 13px; color: var(--muted); }
 
-.next-prayer-pill {
-  margin-top: 10px;
-  background: rgba(255,255,255,0.05);
-  border: 1px solid var(--border);
-  border-radius: 20px; padding: 5px 16px;
-  font-size: 12px; color: var(--muted);
-  display: none;
+.rem-label {
+  font-size: 11px; color: var(--muted);
+  letter-spacing: 0.04em; margin-bottom: 2px;
 }
-.next-prayer-pill.visible { display: inline-block; }
-.next-prayer-pill strong { color: var(--accent); }
+.rem-time {
+  font-size: 26px; font-weight: 700;
+  color: var(--text); letter-spacing: -0.5px; line-height: 1;
+}
+.rem-next {
+  font-size: 12px; color: var(--muted); margin-top: 5px;
+}
+.rem-next strong { color: var(--accent); }
 
-/* =====================
-   Date Row
-   ===================== */
+/* ===========================
+   DATE ROW
+   =========================== */
 .date-row {
-  display: flex; align-items: center; gap: 8px;
+  display: flex; align-items: center; gap: 7px;
   font-size: 12px; color: var(--dim); font-weight: 500;
-  letter-spacing: 0.02em; padding-left: 2px;
+  letter-spacing: 0.02em;
+  flex-wrap: wrap;
 }
-.dot-sep { color: var(--accent); font-size: 14px; }
+.dot { color: var(--accent); }
 
-/* =====================
-   Prayer Cards
-   ===================== */
-.prayers-grid { display: flex; flex-direction: column; gap: 8px; }
+/* ===========================
+   PRAYER CARDS
+   =========================== */
+.prayers-grid {
+  display: flex; flex-direction: column; gap: 7px;
+  width: 100%;
+}
 
 .prayer-card {
   background: var(--card);
   border: 1px solid var(--border);
   border-radius: var(--r);
-  padding: 13px 16px;
+  padding: 12px 14px;
   display: flex; align-items: center;
   justify-content: space-between;
-  transition: border-color 0.2s, transform 0.2s;
-  animation: slideUp 0.4s both;
+  width: 100%;
+  animation: up 0.35s both;
+  transition: border-color 0.2s;
 }
 .prayer-card:nth-child(1) { animation-delay: 0.04s; }
-.prayer-card:nth-child(2) { animation-delay: 0.09s; }
-.prayer-card:nth-child(3) { animation-delay: 0.14s; }
-.prayer-card:nth-child(4) { animation-delay: 0.19s; }
-.prayer-card:nth-child(5) { animation-delay: 0.24s; }
-
-@keyframes slideUp {
-  from { opacity:0; transform: translateY(10px); }
-  to   { opacity:1; transform: translateY(0); }
+.prayer-card:nth-child(2) { animation-delay: 0.08s; }
+.prayer-card:nth-child(3) { animation-delay: 0.12s; }
+.prayer-card:nth-child(4) { animation-delay: 0.16s; }
+.prayer-card:nth-child(5) { animation-delay: 0.20s; }
+@keyframes up {
+  from { opacity:0; transform:translateY(8px); }
+  to   { opacity:1; transform:translateY(0); }
 }
+
 .prayer-card.active-prayer {
-  background: linear-gradient(135deg, #241d44, #1c2a40);
-  border-color: rgba(201,168,76,0.3);
-  box-shadow: 0 4px 20px rgba(201,168,76,0.07);
+  background: linear-gradient(135deg, #231e42, #1b2840);
+  border-color: rgba(201,168,76,0.28);
+  box-shadow: 0 4px 16px rgba(201,168,76,0.06);
 }
-.prayer-card:hover { border-color: rgba(201,168,76,0.18); }
+.prayer-card:hover { border-color: rgba(201,168,76,0.15); }
 
-.prayer-left { display: flex; align-items: center; gap: 12px; }
-.prayer-emoji {
-  font-size: 18px;
-  width: 34px; height: 34px;
+.pc-left  { display: flex; align-items: center; gap: 11px; }
+.pc-emoji {
+  font-size: 17px;
+  width: 32px; height: 32px; flex-shrink: 0;
   background: var(--card2);
-  border-radius: 9px;
+  border-radius: 8px;
   display: flex; align-items: center; justify-content: center;
-  flex-shrink: 0;
 }
-.prayer-card.active-prayer .prayer-emoji { background: var(--glow); }
+.prayer-card.active-prayer .pc-emoji { background: var(--glow); }
 
-.prayer-name-en { font-size: 14px; font-weight: 600; color: var(--text); }
-.prayer-name-ar { font-family: var(--font-d); font-size: 12px; color: var(--dim); margin-top: 1px; }
-.prayer-card.active-prayer .prayer-name-en { color: var(--accent); }
+.pc-name { font-size: 14px; font-weight: 600; color: var(--text); }
+.pc-ar   { font-family: var(--fd); font-size: 11px; color: var(--dim); margin-top: 1px; }
+.prayer-card.active-prayer .pc-name { color: var(--accent); }
 
-.prayer-right { display: flex; align-items: center; gap: 9px; }
-.prayer-time-text {
-  font-size: 15px; font-weight: 700; color: var(--text);
-  font-variant-numeric: tabular-nums; letter-spacing: -0.2px;
+.pc-right  { display: flex; align-items: center; gap: 8px; }
+.pc-time   {
+  font-size: 14px; font-weight: 700; color: var(--text);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
 }
-.active-dot {
+.pc-dot {
   width: 7px; height: 7px; border-radius: 50%;
   background: var(--accent);
-  box-shadow: 0 0 7px var(--accent);
+  box-shadow: 0 0 6px var(--accent);
   display: none;
-  animation: blink 1.6s ease-in-out infinite;
+  animation: blink 1.5s ease-in-out infinite;
 }
-.prayer-card.active-prayer .active-dot { display: block; }
+.prayer-card.active-prayer .pc-dot { display: block; }
 @keyframes blink {
   0%,100% { opacity:1; transform:scale(1); }
-  50%      { opacity:0.4; transform:scale(0.65); }
+  50%     { opacity:0.35; transform:scale(0.6); }
 }
 
-/* =====================
-   Empty State
-   ===================== */
+/* ===========================
+   EMPTY STATE
+   =========================== */
 .empty-state {
-  text-align: center; padding: 30px 16px;
+  text-align: center; padding: 28px 16px;
   color: var(--dim); font-size: 13px;
 }
-.empty-icon { font-size: 36px; margin-bottom: 10px; opacity: 0.5; }
+.empty-state div { font-size: 32px; margin-bottom: 8px; opacity: 0.5; }
 .empty-state.hidden { display: none; }
 
-/* =====================
-   Error Modal
-   ===================== */
+/* ===========================
+   ERROR MODAL
+   =========================== */
 .modal-hidden { display: none !important; }
 .modal-overlay {
   position: fixed; inset: 0; z-index: 9999;
-  background: rgba(0,0,0,0.72);
+  background: rgba(0,0,0,0.75);
   backdrop-filter: blur(10px);
   display: flex; align-items: center; justify-content: center;
+  padding: 20px;
 }
 .modal-card {
   background: var(--card);
   border: 1px solid var(--border);
   border-radius: 20px;
-  padding: 30px 26px;
-  max-width: 310px; width: 90%;
+  padding: 28px 24px;
+  max-width: 300px; width: 100%;
   text-align: center;
   box-shadow: 0 20px 60px rgba(0,0,0,0.5);
-  animation: popIn 0.3s cubic-bezier(0.34,1.56,0.64,1);
+  animation: pop 0.3s cubic-bezier(0.34,1.56,0.64,1);
 }
-@keyframes popIn {
+@keyframes pop {
   from { opacity:0; transform:scale(0.85); }
   to   { opacity:1; transform:scale(1); }
 }
-.modal-icon { font-size: 40px; margin-bottom: 10px; }
-.modal-card h3 { font-size: 17px; font-weight: 700; margin-bottom: 8px; }
-.modal-card p  { font-size: 13px; color: var(--muted); line-height: 1.6; margin-bottom: 18px; }
+.modal-icon { font-size: 38px; margin-bottom: 10px; }
+.modal-card h3 { font-size: 16px; font-weight: 700; margin-bottom: 7px; }
+.modal-card p  { font-size: 13px; color: var(--muted); line-height: 1.55; margin-bottom: 18px; }
 .btn-retry {
   background: var(--accent); color: #1a1500;
-  border: none; border-radius: var(--r-sm);
-  padding: 10px 26px; font-size: 14px; font-weight: 700;
-  font-family: var(--font); cursor: pointer;
+  border: none; border-radius: var(--rsm);
+  padding: 10px 24px; font-size: 14px; font-weight: 700;
+  font-family: var(--f); cursor: pointer;
   transition: background 0.2s;
 }
 .btn-retry:hover { background: var(--accent2); }
 
-/* =====================
-   Desktop Layout (≥768px)
-   ===================== */
+/* ===========================
+   DESKTOP (≥ 768px)
+   No scroll at all
+   =========================== */
 @media (min-width: 768px) {
-  html, body { height: 100%; overflow: hidden; }
-  body { display: flex; flex-direction: column; }
+
+  html, body {
+    height: 100%;
+    overflow: hidden;
+  }
+
+  body {
+    display: flex;
+    flex-direction: column;
+  }
 
   .app-main {
     flex: 1;
-    max-width: 100%;
-    margin: 0;
-    padding: 20px 32px;
     display: grid;
-    grid-template-columns: 320px 1fr;
-    grid-template-rows: 1fr;
+    grid-template-columns: 300px 1fr;
     gap: 20px;
-    align-items: stretch;
+    padding: 20px 28px;
     overflow: hidden;
+    max-width: 100%;
+    align-items: stretch;
   }
 
   .hero-card {
-    height: 100%;
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    padding: 32px 26px;
+    height: 100%;
+    padding: 30px 22px;
   }
-  .hero-content { height: 100%; justify-content: center; }
-  .current-prayer-time { font-size: 46px; }
+  .hero-content {
+    flex: 1;
+    justify-content: center;
+  }
+  .prayer-time { font-size: 44px; }
 
   .right-panel {
-    display: flex; flex-direction: column;
-    gap: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
     overflow: hidden;
+    height: 100%;
   }
 
-  .prayers-grid { gap: 9px; }
-  .prayer-card { padding: 14px 18px; }
+  .prayers-grid { flex: 1; gap: 8px; }
+  .prayer-card  { padding: 13px 16px; }
+  .pc-time      { font-size: 15px; }
 
-  .search-input { width: 200px; }
+  .search-expand.open { max-width: 280px; }
+  .search-input { width: 190px; }
 }
 
-/* =====================
-   Small phones
-   ===================== */
+/* ===========================
+   SMALL PHONES (< 360px)
+   =========================== */
 @media (max-width: 360px) {
-  .current-prayer-time { font-size: 42px; }
-  .logo-circle { width: 68px; height: 68px; }
-  .logo-circle img { width: 42px; height: 42px; }
-  .search-input { width: 145px; }
+  .prayer-time { font-size: 40px; }
+  .logo-circle { width: 66px; height: 66px; }
+  .logo-circle img { width: 40px; height: 40px; }
+  .search-input { width: 130px; }
+  .search-expand.open { max-width: 190px; }
 }

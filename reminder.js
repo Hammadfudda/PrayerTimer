@@ -2,51 +2,50 @@
 // Service Worker
 // ========================
 if ("serviceWorker" in navigator) {
-  window.addEventListener("load", function () {
-    navigator.serviceWorker
-      .register("/serviceWorker.js")
-      .then(() => console.log("SW registered"))
-      .catch(err => console.warn("SW failed:", err));
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("/serviceWorker.js")
+      .then(() => console.log("SW ok"))
+      .catch(e => console.warn("SW fail", e));
   });
 }
 
 // ========================
-// Search Toggle (ONE button only)
+// Search Toggle
 // ========================
 let searchOpen = false;
 
 function toggleSearch() {
   searchOpen = !searchOpen;
-  const expand    = document.getElementById("searchExpand");
-  const toggleBtn = document.getElementById("searchToggleBtn");
-
+  const exp = document.getElementById("searchExpand");
+  const btn = document.getElementById("searchToggleBtn");
   if (searchOpen) {
-    expand.classList.add("open");
-    toggleBtn.classList.add("active");
+    exp.classList.add("open");
+    btn.style.display = "none";
     setTimeout(() => document.getElementById("cityInput").focus(), 380);
   } else {
-    expand.classList.remove("open");
-    toggleBtn.classList.remove("active");
+    exp.classList.remove("open");
+    btn.style.display = "flex";
   }
 }
 
-// Enter key
+// Close on outside click
+document.addEventListener("click", e => {
+  if (!searchOpen) return;
+  const exp = document.getElementById("searchExpand");
+  const btn = document.getElementById("searchToggleBtn");
+  if (!exp.contains(e.target) && !btn.contains(e.target)) {
+    searchOpen = false;
+    exp.classList.remove("open");
+    btn.style.display = "flex";
+  }
+});
+
+// Enter / Escape keys
 document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("cityInput").addEventListener("keydown", e => {
     if (e.key === "Enter") SearchCityName();
-    if (e.key === "Escape") { if (searchOpen) toggleSearch(); }
+    if (e.key === "Escape" && searchOpen) toggleSearch();
   });
-});
-
-// Click outside to close
-document.addEventListener("click", e => {
-  const expand    = document.getElementById("searchExpand");
-  const toggleBtn = document.getElementById("searchToggleBtn");
-  if (searchOpen && !expand.contains(e.target) && !toggleBtn.contains(e.target)) {
-    searchOpen = false;
-    expand.classList.remove("open");
-    toggleBtn.classList.remove("active");
-  }
 });
 
 // ========================
@@ -63,141 +62,133 @@ function closeError() {
 // ========================
 // Time Helpers
 // ========================
-function convertTo12Hour(time24) {
-  if (!time24) return "—";
-  const clean = time24.split(" ")[0];
-  const [h, m] = clean.split(":");
-  let hour = parseInt(h, 10);
-  const ampm = hour >= 12 ? "PM" : "AM";
-  hour = hour % 12 || 12;
-  return `${hour}:${m} ${ampm}`;
+function to12(t) {
+  if (!t) return "—";
+  const [hStr, mStr] = t.split(" ")[0].split(":");
+  let h = parseInt(hStr, 10);
+  const ampm = h >= 12 ? "PM" : "AM";
+  h = h % 12 || 12;
+  return `${h}:${mStr} ${ampm}`;
 }
 
-function getCityDate(timezone) {
+// Get accurate current time in any timezone
+function cityNow(tz) {
   const now = new Date();
   try {
-    const parts = new Intl.DateTimeFormat("en-US", {
-      timeZone: timezone,
-      year: "numeric", month: "2-digit", day: "2-digit",
-      hour: "2-digit", minute: "2-digit", second: "2-digit",
+    const p = new Intl.DateTimeFormat("en-US", {
+      timeZone: tz,
+      year:"numeric", month:"2-digit", day:"2-digit",
+      hour:"2-digit", minute:"2-digit", second:"2-digit",
       hour12: false
     }).formatToParts(now);
-    const get = type => parts.find(p => p.type === type)?.value;
-    let h = parseInt(get("hour"), 10);
+    const g = type => p.find(x => x.type === type)?.value;
+    let h = parseInt(g("hour"), 10);
     if (h === 24) h = 0;
-    const str = `${get("year")}-${get("month")}-${get("day")}T${String(h).padStart(2,"0")}:${get("minute")}:${get("second")}`;
-    return new Date(str);
+    return new Date(`${g("year")}-${g("month")}-${g("day")}T${String(h).padStart(2,"0")}:${g("minute")}:${g("second")}`);
   } catch {
-    return new Date(now.toLocaleString("en-US", { timeZone: timezone }));
+    return new Date(now.toLocaleString("en-US", { timeZone: tz }));
   }
 }
 
-function timeToDate(timeStr, ref) {
+function toDate(timeStr, ref) {
   const [h, m] = timeStr.split(" ")[0].split(":").map(Number);
   const d = new Date(ref);
   d.setHours(h, m, 0, 0);
   return d;
 }
 
-function diffHM(from, to) {
-  const total = Math.max(0, Math.floor((to - from) / 60000));
-  return { hours: Math.floor(total / 60), minutes: total % 60 };
+function diffHM(a, b) {
+  const mins = Math.max(0, Math.floor((b - a) / 60000));
+  return { h: Math.floor(mins / 60), m: mins % 60 };
 }
 
 // ========================
-// Active Prayer (FIXED)
+// Active Prayer Logic
 // ========================
-const PRAYERS = ["Fajr", "Dhuhr", "Asr", "Maghrib", "Isha"];
+const PRAYERS = ["Fajr","Dhuhr","Asr","Maghrib","Isha"];
 
-function getActivePrayer(timings, cityNow) {
-  const dates = {};
-  for (const p of PRAYERS) dates[p] = timeToDate(timings[p], cityNow);
-  const sunrise = timings.Sunrise ? timeToDate(timings.Sunrise, cityNow) : null;
+function activePrayer(timings, now) {
+  const d = {};
+  for (const p of PRAYERS) d[p] = toDate(timings[p], now);
+  const sunrise = timings.Sunrise ? toDate(timings.Sunrise, now) : null;
 
   for (let i = 0; i < PRAYERS.length; i++) {
-    const name  = PRAYERS[i];
-    const start = dates[name];
-    let end, next, nextTime;
+    const name = PRAYERS[i];
+    const start = d[name];
+    let end, next, nextT;
 
     if (name === "Fajr" && sunrise) {
-      end = sunrise; next = "Sunrise"; nextTime = timings.Sunrise;
+      // Fajr window ends at Sunrise
+      end = sunrise; next = "Sunrise"; nextT = timings.Sunrise;
     } else if (name === "Isha") {
-      // Next Fajr: if today's Fajr already passed, use tomorrow's Fajr
-      let nextFajr = dates["Fajr"];
-      if (cityNow >= nextFajr) nextFajr = new Date(nextFajr.getTime() + 86400000);
-      end = nextFajr; next = "Fajr"; nextTime = timings.Fajr;
+      // Isha ends at next Fajr
+      let nf = d["Fajr"];
+      if (now >= nf) nf = new Date(nf.getTime() + 86400000);
+      end = nf; next = "Fajr"; nextT = timings.Fajr;
     } else {
-      next = PRAYERS[i + 1]; nextTime = timings[next]; end = dates[next];
+      next = PRAYERS[i+1]; nextT = timings[next]; end = d[next];
     }
 
-    if (cityNow >= start && cityNow < end) {
-      return { current: name, currentTime: timings[name], remaining: diffHM(cityNow, end), next, nextTime };
+    if (now >= start && now < end) {
+      return { name, time: timings[name], rem: diffHM(now, end), next, nextT };
     }
   }
 
-  // Between Sunrise and Dhuhr
-  if (sunrise && cityNow >= sunrise && cityNow < dates["Dhuhr"]) {
-    return { current: "Dhuhr", currentTime: timings.Dhuhr, remaining: diffHM(cityNow, dates["Dhuhr"]), next: "Dhuhr", nextTime: timings.Dhuhr, waitingFor: true };
+  // Between Sunrise and Dhuhr — waiting for Dhuhr
+  if (sunrise && now >= sunrise && now < d["Dhuhr"]) {
+    return { name:"Dhuhr", time:timings.Dhuhr, rem:diffHM(now, d["Dhuhr"]), next:"Dhuhr", nextT:timings.Dhuhr, waiting:true };
   }
 
-  // Before Fajr (late night) — Fajr aaj ka hai, already future mein hai
-  const nextFajr = cityNow < dates["Fajr"]
-    ? dates["Fajr"]
-    : new Date(dates["Fajr"].getTime() + 86400000);
-  return {
-    current: "Isha", currentTime: timings.Isha,
-    remaining: diffHM(cityNow, nextFajr),
-    next: "Fajr", nextTime: timings.Fajr
-  };
+  // Late night before Fajr
+  const nf = now < d["Fajr"] ? d["Fajr"] : new Date(d["Fajr"].getTime() + 86400000);
+  return { name:"Isha", time:timings.Isha, rem:diffHM(now, nf), next:"Fajr", nextT:timings.Fajr };
 }
 
 // ========================
 // Prayer Metadata
 // ========================
 const META = {
-  Fajr:    { emoji: "🌙", ar: "الفجر" },
-  Dhuhr:   { emoji: "☀️",  ar: "الظهر" },
-  Asr:     { emoji: "🌤️", ar: "العصر" },
-  Maghrib: { emoji: "🌅", ar: "المغرب" },
-  Isha:    { emoji: "🌙", ar: "العشاء" },
+  Fajr:    { e:"🌙", ar:"الفجر" },
+  Dhuhr:   { e:"☀️",  ar:"الظهر" },
+  Asr:     { e:"🌤️", ar:"العصر" },
+  Maghrib: { e:"🌅", ar:"المغرب" },
+  Isha:    { e:"🌙", ar:"العشاء" },
 };
 
 // ========================
-// UI Render
+// Render UI
 // ========================
-function updateHero(info) {
-  const { current, currentTime, remaining, next, nextTime, waitingFor } = info;
-  document.getElementById("currentPrayerLabel").textContent = waitingFor ? "Upcoming" : current + " Prayer";
-  document.getElementById("currentPrayerTime").textContent  = convertTo12Hour(currentTime);
+function renderHero(info) {
+  document.getElementById("currentPrayerLabel").textContent =
+    info.waiting ? "Upcoming" : info.name + " Prayer";
+  document.getElementById("currentPrayerTime").textContent = to12(info.time);
 
-  document.getElementById("remainingBlock").innerHTML = waitingFor
-    ? `<div class="remaining-label">Dhuhr starts in</div>
-       <div class="remaining-time-big">${remaining.hours}h ${remaining.minutes}m</div>`
-    : `<div class="remaining-label">Ends in</div>
-       <div class="remaining-time-big">${remaining.hours}h ${remaining.minutes}m</div>
-       <div class="remaining-sub">Next: <strong>${next}</strong> at <strong>${convertTo12Hour(nextTime)}</strong></div>`;
+  document.getElementById("remainingBlock").innerHTML = info.waiting
+    ? `<div class="rem-label">Dhuhr starts in</div>
+       <div class="rem-time">${info.rem.h}h ${info.rem.m}m</div>`
+    : `<div class="rem-label">Ends in</div>
+       <div class="rem-time">${info.rem.h}h ${info.rem.m}m</div>
+       <div class="rem-next">Next: <strong>${info.next}</strong> at <strong>${to12(info.nextT)}</strong></div>`;
 }
 
-function buildGrid(timings, activeName) {
+function renderGrid(timings, active) {
   const grid = document.getElementById("prayerGrid");
   grid.innerHTML = "";
-
   for (const name of PRAYERS) {
-    const m = META[name] || { emoji: "🕌", ar: "" };
-    const isActive = name === activeName;
+    const m = META[name];
     const card = document.createElement("div");
-    card.className = "prayer-card" + (isActive ? " active-prayer" : "");
+    card.className = "prayer-card" + (name === active ? " active-prayer" : "");
     card.innerHTML = `
-      <div class="prayer-left">
-        <div class="prayer-emoji">${m.emoji}</div>
+      <div class="pc-left">
+        <div class="pc-emoji">${m.e}</div>
         <div>
-          <div class="prayer-name-en">${name}</div>
-          <div class="prayer-name-ar">${m.ar}</div>
+          <div class="pc-name">${name}</div>
+          <div class="pc-ar">${m.ar}</div>
         </div>
       </div>
-      <div class="prayer-right">
-        <div class="prayer-time-text">${convertTo12Hour(timings[name])}</div>
-        <div class="active-dot"></div>
+      <div class="pc-right">
+        <div class="pc-time">${to12(timings[name])}</div>
+        <div class="pc-dot"></div>
       </div>`;
     grid.appendChild(card);
   }
@@ -207,59 +198,61 @@ function buildGrid(timings, activeName) {
 // ========================
 // Live Clock
 // ========================
-let clockInterval = null;
-let savedTimings  = null;
-let savedTimezone = null;
+let _interval = null, _timings = null, _tz = null;
 
-function startClock(timezone) {
-  savedTimezone = timezone;
-  if (clockInterval) clearInterval(clockInterval);
+function startClock(tz) {
+  _tz = tz;
+  if (_interval) clearInterval(_interval);
 
   function tick() {
-    const now = getCityDate(timezone);
+    const now = cityNow(tz);
+
+    // Date
     document.getElementById("liveDate").textContent =
       now.toLocaleDateString("en-US", { weekday:"long", month:"long", day:"numeric" });
 
+    // Clock
     const h = now.getHours(), m = now.getMinutes(), s = now.getSeconds();
-    const ampm = h >= 12 ? "PM" : "AM";
     document.getElementById("liveClock").textContent =
-      `${h%12||12}:${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")} ${ampm}`;
+      `${h%12||12}:${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")} ${h>=12?"PM":"AM"}`;
 
-    // Refresh every minute
-    if (savedTimings && s === 0) {
-      const info = getActivePrayer(savedTimings, now);
-      updateHero(info);
-      buildGrid(savedTimings, info.waitingFor ? "Dhuhr" : info.current);
+    // Refresh prayer info every minute
+    if (_timings && s === 0) {
+      const info = activePrayer(_timings, now);
+      renderHero(info);
+      renderGrid(_timings, info.waiting ? "Dhuhr" : info.name);
     }
   }
+
   tick();
-  clockInterval = setInterval(tick, 1000);
+  _interval = setInterval(tick, 1000);
 }
 
 // ========================
 // Full Render
 // ========================
-function renderAll(city, timezone, timings) {
-  savedTimings = timings;
-  const now    = getCityDate(timezone);
-  const info   = getActivePrayer(timings, now);
+function renderAll(city, tz, timings) {
+  _timings = timings;
+  const now  = cityNow(tz);
+  const info = activePrayer(timings, now);
 
   document.getElementById("cityBadge").textContent = city;
-  updateHero(info);
-  buildGrid(timings, info.waitingFor ? "Dhuhr" : info.current);
-  startClock(timezone);
+  renderHero(info);
+  renderGrid(timings, info.waiting ? "Dhuhr" : info.name);
+  startClock(tz);
+}
+
+// ========================
+// Loading State
+// ========================
+function setLoading(on) {
+  document.getElementById("searchButton").style.display = on ? "none" : "flex";
+  document.getElementById("spinnerChecker").classList.toggle("active", on);
 }
 
 // ========================
 // Search
 // ========================
-function setLoading(on) {
-  const btn = document.getElementById("searchButton");
-  const sp  = document.getElementById("spinnerChecker");
-  btn.style.display = on ? "none" : "flex";
-  on ? sp.classList.add("active") : sp.classList.remove("active");
-}
-
 function SearchCityName() {
   const val = document.getElementById("cityInput").value.trim();
   if (!val) return;
@@ -272,9 +265,9 @@ function SearchCityName() {
         showErrorCard(); setLoading(false); return null;
       }
       const { lat, lng } = data.results[0].geometry;
-      const tz    = data.results[0].annotations.timezone.name || "Asia/Karachi";
-      const comp  = data.results[0].components;
-      const city  = comp?.city || comp?.town || comp?.state || val;
+      const tz   = data.results[0].annotations.timezone.name || "Asia/Karachi";
+      const comp = data.results[0].components;
+      const city = comp?.city || comp?.town || comp?.state || val;
 
       return fetch(`https://api.aladhan.com/v1/timings?latitude=${lat}&longitude=${lng}&method=2&school=1`)
         .then(r => r.json())
@@ -282,10 +275,10 @@ function SearchCityName() {
     })
     .then(res => {
       if (!res) return;
-      const cleaned = {};
-      for (const [k, v] of Object.entries(res.timings)) cleaned[k] = v.split(" ")[0];
-      saveData(res.city, res.tz, cleaned);
-      renderAll(res.city, res.tz, cleaned);
+      const clean = {};
+      for (const [k,v] of Object.entries(res.timings)) clean[k] = v.split(" ")[0];
+      save(res.city, res.tz, clean);
+      renderAll(res.city, res.tz, clean);
       document.getElementById("cityInput").value = "";
       if (searchOpen) toggleSearch();
     })
@@ -296,50 +289,63 @@ function SearchCityName() {
 // ========================
 // LocalStorage
 // ========================
-const KEY = "pt_v3";
+const KEY = "pt_v4";
 
-function saveData(city, tz, timings) {
+function save(city, tz, timings) {
   localStorage.setItem(KEY, JSON.stringify({ city, tz, timings, date: new Date().toDateString() }));
 }
 
-function loadData() {
+function load() {
   try {
     const d = JSON.parse(localStorage.getItem(KEY));
     if (!d) return null;
-    if (d.date !== new Date().toDateString()) return { city: d.city, tz: d.tz, stale: true };
+    if (d.date !== new Date().toDateString()) return { city:d.city, tz:d.tz, stale:true };
     return d;
   } catch { return null; }
 }
 
-function silentRefetch(city) {
-  fetch(`https://api.opencagedata.com/geocode/v1/json?q=${encodeURIComponent(city)}&key=3968313623964ce893353132aee0eea0`)
+function silentRefetch(city, tz) {
+  // Use saved tz directly to avoid geocode call on stale
+  fetch(`https://api.aladhan.com/v1/timingsByCity?city=${encodeURIComponent(city)}&country=&method=2&school=1`)
     .then(r => r.json())
-    .then(data => {
-      if (!data.results?.length) return;
-      const { lat, lng } = data.results[0].geometry;
-      const tz   = data.results[0].annotations?.timezone?.name || "Asia/Karachi";
-      const comp = data.results[0].components;
-      const name = comp?.city || comp?.town || city;
-      return fetch(`https://api.aladhan.com/v1/timings?latitude=${lat}&longitude=${lng}&method=2&school=1`)
-        .then(r => r.json())
-        .then(td => {
-          const cleaned = {};
-          for (const [k,v] of Object.entries(td.data.timings)) cleaned[k] = v.split(" ")[0];
-          saveData(name, tz, cleaned);
-          renderAll(name, tz, cleaned);
-        });
+    .then(td => {
+      if (!td?.data?.timings) throw new Error("no data");
+      const clean = {};
+      for (const [k,v] of Object.entries(td.data.timings)) clean[k] = v.split(" ")[0];
+      save(city, tz, clean);
+      renderAll(city, tz, clean);
     })
-    .catch(console.warn);
+    .catch(() => {
+      // If timingsByCity fails, fallback to geocode refetch
+      fetch(`https://api.opencagedata.com/geocode/v1/json?q=${encodeURIComponent(city)}&key=3968313623964ce893353132aee0eea0`)
+        .then(r => r.json())
+        .then(data => {
+          if (!data.results?.length) return;
+          const { lat, lng } = data.results[0].geometry;
+          const timezone = data.results[0].annotations?.timezone?.name || tz;
+          const comp = data.results[0].components;
+          const name = comp?.city || comp?.town || city;
+          return fetch(`https://api.aladhan.com/v1/timings?latitude=${lat}&longitude=${lng}&method=2&school=1`)
+            .then(r => r.json())
+            .then(td => {
+              const clean = {};
+              for (const [k,v] of Object.entries(td.data.timings)) clean[k] = v.split(" ")[0];
+              save(name, timezone, clean);
+              renderAll(name, timezone, clean);
+            });
+        })
+        .catch(console.warn);
+    });
 }
 
 // ========================
-// Init
+// Init on load
 // ========================
 window.addEventListener("DOMContentLoaded", () => {
-  const saved = loadData();
+  const saved = load();
   if (saved?.timings) {
     renderAll(saved.city, saved.tz, saved.timings);
   } else if (saved?.stale) {
-    silentRefetch(saved.city);
+    silentRefetch(saved.city, saved.tz);
   }
 });

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
   <title>Prayer Times</title>
   <link rel="manifest" href="manifest.json" />
   <link rel="apple-touch-icon" href="assets/icons/icon-192x192.png" />
@@ -11,7 +11,7 @@
   <link rel="icon" href="./assets/islamic.png" type="image/x-icon" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -38,22 +38,22 @@
       </div>
     </div>
     <div class="header-right">
-      <!-- Only icon shown by default -->
+      <!-- Search bar — hidden by default -->
+      <div class="search-expand" id="searchExpand">
+        <input type="text" id="cityInput" class="search-input" placeholder="Enter city..." />
+        <div class="spinner" id="spinnerChecker"></div>
+        <button class="btn-go" id="searchButton" onclick="SearchCityName()">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z"/>
+          </svg>
+        </button>
+      </div>
+      <!-- Toggle icon — always visible -->
       <button class="search-icon-btn" id="searchToggleBtn" onclick="toggleSearch()">
         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
           <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z"/>
         </svg>
       </button>
-      <!-- Hidden search bar -->
-      <div class="search-expand" id="searchExpand">
-        <input type="text" id="cityInput" class="search-input" placeholder="Enter city name..." />
-        <div class="spinner" id="spinnerChecker"></div>
-        <button class="btn-go" id="searchButton" onclick="SearchCityName()">
-          <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z"/>
-          </svg>
-        </button>
-      </div>
     </div>
   </header>
 
@@ -61,31 +61,30 @@
   <main class="app-main">
 
     <!-- Hero Card -->
-    <div class="hero-card" id="heroCard">
-      <div class="hero-bg-glow"></div>
+    <div class="hero-card">
+      <div class="hero-glow"></div>
       <div class="hero-content">
-        <div class="current-prayer-label" id="currentPrayerLabel">—</div>
-        <div class="current-prayer-time" id="currentPrayerTime">—</div>
+        <div class="prayer-label" id="currentPrayerLabel">—</div>
+        <div class="prayer-time" id="currentPrayerTime">—</div>
         <div class="logo-circle">
           <img src="./assets/islamic.png" alt="Masjid">
         </div>
-        <div class="remaining-block" id="remainingBlock">
-          <div class="remaining-label">Search a city to begin</div>
+        <div id="remainingBlock">
+          <div class="rem-hint">Search a city to begin</div>
         </div>
-        <div class="next-prayer-pill" id="nextPrayerBlock"></div>
       </div>
     </div>
 
-    <!-- Right panel (date + prayers) -->
+    <!-- Right Panel -->
     <div class="right-panel">
-      <div class="date-row" id="dateRow">
+      <div class="date-row">
         <span id="liveDate"></span>
-        <span class="dot-sep">·</span>
+        <span class="dot">·</span>
         <span id="liveClock"></span>
       </div>
       <div class="prayers-grid" id="prayerGrid"></div>
       <div class="empty-state" id="emptyState">
-        <div class="empty-icon">🔍</div>
+        <div>🔍</div>
         <p>Search your city to see prayer times</p>
       </div>
     </div>
